@@ -28,4 +28,5 @@ app.configure('development', function(){
 app.configure('production', function(){
   app.use(express.errorHandler());
 });
-// *******************************************************
+
+app.listen(process.env.PORT || 3000);
