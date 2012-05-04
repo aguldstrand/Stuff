@@ -1,0 +1,4 @@
+# git ignore file
+Fractal.v11.suo
+Fractal/bin
+Fractal/obj

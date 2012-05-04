@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 11
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fractal", "Fractal\Fractal.csproj", "{21DDAF40-AD58-44BE-B8F5-2535531E69BC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{21DDAF40-AD58-44BE-B8F5-2535531E69BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{21DDAF40-AD58-44BE-B8F5-2535531E69BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{21DDAF40-AD58-44BE-B8F5-2535531E69BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{21DDAF40-AD58-44BE-B8F5-2535531E69BC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
