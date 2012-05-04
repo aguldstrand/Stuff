@@ -12,6 +12,7 @@
 
 #include "rgba.h"
 #include <iostream>
+#include <ppl.h>
 
 extern "C" {
 
