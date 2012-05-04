@@ -2,12 +2,18 @@
 {
     class MandelCube : Fractal.IRenderable
     {
+        private readonly int maxIterations;
+
+        public MandelCube(int maxIterations)
+        {
+            this.maxIterations = maxIterations;
+        }
+
         public float HitTest(Vector3 c)
         {
             const float scale = 2f;
             const float r = .5f;
             const float f = 1.0f;
-            const int maxIterations = 255;
 
             var z = c;
 

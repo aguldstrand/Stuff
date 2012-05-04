@@ -1,4 +1,16 @@
 # git ignore file
+
+# Fractal
 Fractal.v11.suo
 Fractal/bin
 Fractal/obj
+Render
+Thumbs.db
+
+# Native fractal
+Debug
+NativeFractal/Debug
+ipch
+Fractal.sdf
+Fractal.opensdf
+NativeFractal/NativeFractal.vcxproj.filters

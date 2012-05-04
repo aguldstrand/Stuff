@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 
 namespace Fractal
@@ -9,21 +10,23 @@ namespace Fractal
     {
         static void Main(string[] args)
         {
-            MandelcubeSlice();
+            // MandelcubeSlice();
+            Mandelcube();
         }
 
         private static void Mandelcube()
         {
             var start = DateTime.Now;
 
-            int width = 200;
-            int height = 200;
+            int width = 400;
+            int height = 400;
 
             var rayTracer = new RayTracer(
                 bounds: new Bounds3(
                     pos: new Vector3(-6.5f, -6.5f, -6.5f),
                     size: new Vector3(13f, 13f, 13f)),
-                fractal: new MandelCube(),
+                fractal: new MandelCube(
+                    maxIterations: 255),
                 camera: new Camera(
                     pos: new Vector3(0, 0, -30),
                     lookAt: new Vector3(0, 0, 0),
@@ -36,7 +39,10 @@ namespace Fractal
                 rayTracer.Render(bits.Scan0, width, height);
 
                 outp.UnlockBits(bits);
-                outp.Save(string.Format(@"C:\Users\Anders\Desktop\apa.png"));
+
+                var folder = @"..\..\..\Render\";
+                Directory.CreateDirectory(folder);
+                outp.Save(Path.Combine(folder, "outp.png"));
             }
 
             Console.WriteLine(DateTime.Now - start);
@@ -63,7 +69,7 @@ namespace Fractal
                     })
                 .ToArray();
 
-            var fractal = new MandelCube();
+            var fractal = new MandelCube(255);
 
             Enumerable.Range(0, height)
                 .AsParallel()
