@@ -3,10 +3,10 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 11
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fractal", "Fractal\Fractal.csproj", "{21DDAF40-AD58-44BE-B8F5-2535531E69BC}"
 	ProjectSection(ProjectDependencies) = postProject
-		{1E09053E-E141-F092-A859-14483509FAC4} = {1E09053E-E141-F092-A859-14483509FAC4}
+		{F1B7D6BB-F03E-0F05-64DD-FAACAB3A916A} = {F1B7D6BB-F03E-0F05-64DD-FAACAB3A916A}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NativeFractal", "NativeFractal\NativeFractal.vcxproj", "{1E09053E-E141-F092-A859-14483509FAC4}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "raytrace", "raytrace\raytrace.vcxproj", "{F1B7D6BB-F03E-0F05-64DD-FAACAB3A916A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,16 +18,6 @@ Global
 		Release|Win32 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{1E09053E-E141-F092-A859-14483509FAC4}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{1E09053E-E141-F092-A859-14483509FAC4}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
-		{1E09053E-E141-F092-A859-14483509FAC4}.Debug|Mixed Platforms.Build.0 = Debug|Win32
-		{1E09053E-E141-F092-A859-14483509FAC4}.Debug|Win32.ActiveCfg = Debug|Win32
-		{1E09053E-E141-F092-A859-14483509FAC4}.Debug|Win32.Build.0 = Debug|Win32
-		{1E09053E-E141-F092-A859-14483509FAC4}.Release|Any CPU.ActiveCfg = Release|Win32
-		{1E09053E-E141-F092-A859-14483509FAC4}.Release|Mixed Platforms.ActiveCfg = Release|Win32
-		{1E09053E-E141-F092-A859-14483509FAC4}.Release|Mixed Platforms.Build.0 = Release|Win32
-		{1E09053E-E141-F092-A859-14483509FAC4}.Release|Win32.ActiveCfg = Release|Win32
-		{1E09053E-E141-F092-A859-14483509FAC4}.Release|Win32.Build.0 = Release|Win32
 		{21DDAF40-AD58-44BE-B8F5-2535531E69BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{21DDAF40-AD58-44BE-B8F5-2535531E69BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{21DDAF40-AD58-44BE-B8F5-2535531E69BC}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
@@ -38,6 +28,16 @@ Global
 		{21DDAF40-AD58-44BE-B8F5-2535531E69BC}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{21DDAF40-AD58-44BE-B8F5-2535531E69BC}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{21DDAF40-AD58-44BE-B8F5-2535531E69BC}.Release|Win32.ActiveCfg = Release|Any CPU
+		{F1B7D6BB-F03E-0F05-64DD-FAACAB3A916A}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{F1B7D6BB-F03E-0F05-64DD-FAACAB3A916A}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{F1B7D6BB-F03E-0F05-64DD-FAACAB3A916A}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{F1B7D6BB-F03E-0F05-64DD-FAACAB3A916A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F1B7D6BB-F03E-0F05-64DD-FAACAB3A916A}.Debug|Win32.Build.0 = Debug|Win32
+		{F1B7D6BB-F03E-0F05-64DD-FAACAB3A916A}.Release|Any CPU.ActiveCfg = Release|Win32
+		{F1B7D6BB-F03E-0F05-64DD-FAACAB3A916A}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{F1B7D6BB-F03E-0F05-64DD-FAACAB3A916A}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{F1B7D6BB-F03E-0F05-64DD-FAACAB3A916A}.Release|Win32.ActiveCfg = Release|Win32
+		{F1B7D6BB-F03E-0F05-64DD-FAACAB3A916A}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace Fractal
 {
@@ -36,17 +37,46 @@ namespace Fractal
             {
                 var bits = outp.LockBits(new Rectangle(Point.Empty, outp.Size), System.Drawing.Imaging.ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
 
-                rayTracer.Render(bits.Scan0, width, height);
+                render(
+                    -6.5f, -6.5f, -6.5f,
+                    13f, 13f, 13f,
+                    255,
+                    0, 0, -30,
+                    0, 0, 0,
+                    18, 18,
+                    bits.Scan0, width, height);
+                // rayTracer.Render(bits.Scan0, width, height);
 
                 outp.UnlockBits(bits);
 
-                var folder = @"..\..\..\Render\";
+                var folder = @"..\Render\";
                 Directory.CreateDirectory(folder);
                 outp.Save(Path.Combine(folder, "outp.png"));
             }
 
             Console.WriteLine(DateTime.Now - start);
         }
+
+        [DllImport("raytrace.dll")]
+        private static extern void render(
+            float boundPosX,
+            float boundPosY,
+            float boundPosZ,
+            float boundSizeX,
+            float boundSizeY,
+            float boundSizeZ,
+            int fractalMaxIterations,
+            float camPosX,
+            float camPosY,
+            float camPosZ,
+            float camLookAtX,
+            float camLookAtY,
+            float camLookAtZ,
+            float camFrustrumSizeX,
+            float camFrustrumSizeY,
+            IntPtr ptr,
+            int width,
+            int height);
 
         private static void MandelcubeSlice()
         {

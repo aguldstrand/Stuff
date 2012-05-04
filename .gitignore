@@ -7,10 +7,8 @@ Fractal/obj
 Render
 Thumbs.db
 
-# Native fractal
 Debug
-NativeFractal/Debug
+raytrace/Debug
+Release
+raytrace/Release
 ipch
-Fractal.sdf
-Fractal.opensdf
-NativeFractal/NativeFractal.vcxproj.filters
