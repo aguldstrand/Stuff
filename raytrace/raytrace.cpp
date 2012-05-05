@@ -65,7 +65,7 @@ public:
 		Concurrency::parallel_for(0, height, [&width, &xStep, &yStep, &ptr, &outsideColorTable, &camera, &bounds, &fractal](int y) {
 		// for(int y = 0; y < height; y++) {
 			std::cout <<"y:" <<y <<std::endl;
-
+			
 			// Concurrency::parallel_for(0, width, [&y, &width, &xStep, &yStep, &ptr, &outsideColorTable, &camera, &bounds, &fractal](int x) {
             for (int x = 0; x < width; x++) {
                 const int pixelIndex = width * y + x;

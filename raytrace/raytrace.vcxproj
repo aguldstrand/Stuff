@@ -76,9 +76,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="raytrace.h" />
     <ClInclude Include="rgba.h" />
     <ClInclude Include="stdafx.h" />
