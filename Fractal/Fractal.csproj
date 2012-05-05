@@ -44,17 +44,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Bounds3.cs" />
-    <Compile Include="Camera.cs" />
-    <Compile Include="IHitTest.cs" />
-    <Compile Include="MandelCube.cs" />
-    <Compile Include="Plane3.cs" />
+    <Compile Include="Raytrace\Bounds3.cs" />
+    <Compile Include="Raytrace\Camera.cs" />
+    <Compile Include="Raytrace\IHitTest.cs" />
+    <Compile Include="Raytrace\MandelCube.cs" />
+    <Compile Include="Raytrace\Plane3.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RayTracer.cs" />
-    <Compile Include="Sphere.cs" />
-    <Compile Include="Vector2.cs" />
-    <Compile Include="Vector3.cs" />
+    <Compile Include="Raytrace\RayTracer.cs" />
+    <Compile Include="Raytrace\Sphere.cs" />
+    <Compile Include="Raytrace\Vector2.cs" />
+    <Compile Include="Raytrace\Vector3.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

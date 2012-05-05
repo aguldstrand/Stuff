@@ -81,6 +81,13 @@ struct Bounds3 {
 	Bounds3(const Vector3 &pos, const Vector3 &size)
 		: pos(pos), size(size) {
 	}
+
+	bool intersects(const Vector3 &v) const {
+		return
+			pos.x <= v.x && v.x < pos.x + size.x &&
+			pos.y <= v.y && v.y < pos.y + size.y &&
+			pos.z <= v.z && v.z < pos.z + size.z;
+	}
 };
 
 struct Camera {

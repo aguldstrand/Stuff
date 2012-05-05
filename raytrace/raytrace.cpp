@@ -13,18 +13,20 @@ private:
 	const TFractal &fractal;
 	const Camera camera;
 
-	static bool hitTest(const Vector3 &origin, const Vector3 &direction, const float maxDistance, const float stepSize, const TFractal &fractal, Vector3 &hitPos, float &iterations) {
+	static bool hitTest(const Vector3 &origin, const Vector3 &direction, const float maxDistance, const float stepSize, const TFractal &fractal, const Bounds3 &bounds, Vector3 &hitPos, float &iterations) {
         const Vector3 step = direction * stepSize;
         hitPos = origin + step;
         iterations = 0;
 
         while ((hitPos - origin).len() < maxDistance)
         {
-            iterations = fractal.hitTest(hitPos);
-            if (iterations >= threshold)
-            {
-                return true;
-            }
+			if(bounds.intersects(hitPos)) {
+				iterations = fractal.hitTest(hitPos);
+				if (iterations >= threshold)
+				{
+					return true;
+				}
+			}
 
             hitPos = hitPos + step;
         }
@@ -60,10 +62,11 @@ public:
         Vector3 yStep = (camera.frustrumFrontPlane.bottomLeft - camera.frustrumFrontPlane.topLeft) / height;
 
 
-		Concurrency::parallel_for(0, height, [&width, &xStep, &yStep, &ptr, &outsideColorTable, &camera, &bounds, &fractal](int y){
-		//for(int y = 0; y < height; y++) {
+		Concurrency::parallel_for(0, height, [&width, &xStep, &yStep, &ptr, &outsideColorTable, &camera, &bounds, &fractal](int y) {
+		// for(int y = 0; y < height; y++) {
 			std::cout <<"y:" <<y <<std::endl;
 
+			// Concurrency::parallel_for(0, width, [&y, &width, &xStep, &yStep, &ptr, &outsideColorTable, &camera, &bounds, &fractal](int x) {
             for (int x = 0; x < width; x++) {
                 const int pixelIndex = width * y + x;
 
@@ -81,6 +84,7 @@ public:
                     ray.len(),
 					bounds.size.x / width,
 					fractal,
+					bounds,
                     hit,
                     iterations)) {
 					ptr[pixelIndex] = outsideColorTable[(int)((hit - camera.pos).len() / 27 * 255)];

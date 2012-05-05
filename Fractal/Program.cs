@@ -19,8 +19,8 @@ namespace Fractal
         {
             var start = DateTime.Now;
 
-            int width = 400;
-            int height = 400;
+            int width = 4000;
+            int height = 4000;
 
             var rayTracer = new RayTracer(
                 bounds: new Bounds3(
