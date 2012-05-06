@@ -90,6 +90,20 @@ struct Bounds3 {
 	}
 };
 
+struct Bounds2 {
+	const Vector2 pos, size;
+
+	Bounds2(const Vector2 &pos, const Vector2 &size)
+		: pos(pos), size(size) {
+	}
+
+	bool intersects(const Vector2 &v) const {
+		return
+			pos.x <= v.x && v.x < pos.x + size.x &&
+			pos.y <= v.y && v.y < pos.y + size.y;
+	}
+};
+
 struct Camera {
 	const Vector3 pos;
 	const Plane3 frustrumFrontPlane;

@@ -14,25 +14,69 @@
 #include <iostream>
 #include <ppl.h>
 
-extern "C" {
+namespace renderer {
 
-RAYTRACE_API void render(
-		float boundPosX,
-		float boundPosY,
-		float boundPosZ,
-		float boundSizeX,
-		float boundSizeY,
-		float boundSizeZ,
-		int fractalMaxIterations,
-		float camPosX,
-		float camPosY,
-		float camPosZ,
-		float camLookAtX,
-		float camLookAtY,
-		float camLookAtZ,
-		float camFrustrumSizeX,
-		float camFrustrumSizeY,
-		Rgb *ptr,
-		int width,
-		int height);
-}
+
+	RAYTRACE_API class MandelCube {
+	private:
+		const int maxIterations;
+
+		static Vector3 boxFold(const Vector3 &v);
+
+		static Vector3 ballFold(const float r, const Vector3 &v);
+
+	public:
+		RAYTRACE_API MandelCube(const int maxIterations);
+
+		float hitTest(const Vector3 &c) const;
+	};
+
+
+	class RayTracer {
+	private:
+		const Bounds3 bounds;
+		const MandelCube &fractal;
+		const Camera camera;
+
+		static bool hitTest(const Vector3 &origin, const Vector3 &direction, const float maxDistance, const float stepSize, const MandelCube &fractal, const Bounds3 &bounds, Vector3 &hitPos, float &iterations);
+	public:
+		RAYTRACE_API RayTracer(const Bounds3 &bounds, const MandelCube &fractal, const Camera &camera);
+
+		RAYTRACE_API void render(Rgb *ptr, int width, int height);
+
+		RAYTRACE_API void startRender(
+			Rgb *ptr,
+			int width,
+			int height,
+			std::function<void(const Bounds2&)> blockCompleteCallback,
+			std::function<void(void)> imageCompleteCallback);
+	};
+
+
+
+
+
+	extern "C" {
+
+	RAYTRACE_API void render(
+			float boundPosX,
+			float boundPosY,
+			float boundPosZ,
+			float boundSizeX,
+			float boundSizeY,
+			float boundSizeZ,
+			int fractalMaxIterations,
+			float camPosX,
+			float camPosY,
+			float camPosZ,
+			float camLookAtX,
+			float camLookAtY,
+			float camLookAtZ,
+			float camFrustrumSizeX,
+			float camFrustrumSizeY,
+			Rgb *ptr,
+			int width,
+			int height);
+	}
+
+};
