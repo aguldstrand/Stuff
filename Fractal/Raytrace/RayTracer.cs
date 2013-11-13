@@ -39,7 +39,6 @@ namespace Fractal
             Rgb* ptr = (Rgb*)bits;
             Enumerable.Range(0, height)
                 .AsParallel()
-                .WithDegreeOfParallelism(2)
                 .ForAll(y =>
                 {
                     Console.WriteLine("y:{0} ", y);

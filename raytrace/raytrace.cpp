@@ -82,9 +82,9 @@ void renderer::RayTracer::render(Rgb *ptr, int width, int height) {
 			outsideColorTable[i] = insideColor;
 		} else {
 			Rgb &color = outsideColorTable[i];
-			color.r = (BYTE)i;
-			color.g = (BYTE)i;
-			color.b = (BYTE)i;
+			color.r = (BYTE)(i % (256 / 3));
+			color.g = (BYTE)(i % (256 / 3));
+			color.b = (BYTE)(i % (256 / 3));
 		}
 	}
 
@@ -175,6 +175,39 @@ extern "C" {
 				Vector2(camFrustrumSizeX, camFrustrumSizeY)));
 
 		rayTracer.render(ptr, width, height);
+	}
 
+	RAYTRACE_API void slice(int width, int height, float bx, float by, float bw, float bh, int z, Rgb *ptr)
+	{
+		renderer::MandelCube mandelCube(255);
+
+		Rgb insideColor;
+		Rgb outsideColorTable[255];
+		for (int i = 0; i < 255; i++) {
+			if (i < 20) {
+				outsideColorTable[i] = insideColor;
+			}
+			else {
+				Rgb &color = outsideColorTable[i];
+				color.r = (BYTE)(i % (256 / 3));
+				color.g = (BYTE)(i % (256 / 3));
+				color.b = (BYTE)(i % (256 / 3));
+			}
+		}
+
+		for (int y = 0; y < height; y++)
+		{
+			for (int x = 0; x < width; x++)
+			{
+				int i = width * y + x;
+
+				Vector3 coordinate(
+					x / (float)width * bw + bx,
+					y / (float)height * bw + by,
+					z / (float)height * bw + by);
+
+				ptr[i] = outsideColorTable[(int)(mandelCube.hitTest(coordinate) * 255)];
+			}
+		}
 	}
 }

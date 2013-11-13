@@ -17,10 +17,13 @@ namespace Fractal
 
         private static void Mandelcube()
         {
+            MandelcubeSlice();
+            return;
+
             var start = DateTime.Now;
 
-            int width = 1000;
-            int height = 1000;
+            int width = 512;
+            int height = 512;
 
             var rayTracer = new RayTracer(
                 bounds: new Bounds3(
@@ -29,7 +32,7 @@ namespace Fractal
                 fractal: new MandelCube(
                     maxIterations: 255),
                 camera: new Camera(
-                    pos: new Vector3(0, 0, -30),
+                    pos: new Vector3(0, 0, -10),
                     lookAt: new Vector3(0, 0, 0),
                     frustrumSize: new Vector2(18f, 18f)));
 
@@ -37,6 +40,7 @@ namespace Fractal
             {
                 var bits = outp.LockBits(new Rectangle(Point.Empty, outp.Size), System.Drawing.Imaging.ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
 
+                /*
                 render(
                     -6.5f, -6.5f, -6.5f,
                     13f, 13f, 13f,
@@ -45,13 +49,14 @@ namespace Fractal
                     0, 0, 0,
                     18, 18,
                     bits.Scan0, width, height);
-                // rayTracer.Render(bits.Scan0, width, height);
+                 * */
+                rayTracer.Render(bits.Scan0, width, height);
 
                 outp.UnlockBits(bits);
 
                 var folder = @"..\Render\";
                 Directory.CreateDirectory(folder);
-                outp.Save(Path.Combine(folder, "outp.png"));
+                outp.Save(Path.Combine(folder, DateTime.Now.ToString("yyyyMMdd hhmmss") + ".png"));
             }
 
             Console.WriteLine(DateTime.Now - start);
@@ -78,10 +83,21 @@ namespace Fractal
             int width,
             int height);
 
+        [DllImport("raytrace.dll")]
+		private static extern void slice(
+			int width,
+			int height,
+			float bx,
+			float by,
+			float bw,
+			float bh,
+			int z,
+			IntPtr ptr);
+
         private static void MandelcubeSlice()
         {
-            var width = 2048;
-            var height = 2048;
+            var width = 1024;
+            var height = 1024;
             var bounds = new RectangleF(-6.5f, -6.5f, 13.0f, 13.0f);
 
             Rgb zero = new Rgb { r = 0, g = 61, b = 245 };
@@ -103,6 +119,7 @@ namespace Fractal
 
             Enumerable.Range(0, height)
                 .AsParallel()
+                .AsOrdered()
                 .ForAll(z =>
                 {
                     var start = DateTime.Now;
@@ -110,28 +127,11 @@ namespace Fractal
                     using (var outp = new Bitmap(width, height))
                     {
                         var bits = outp.LockBits(new Rectangle(Point.Empty, outp.Size), System.Drawing.Imaging.ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
-                        unsafe
-                        {
-                            Rgb* ptr = (Rgb*)bits.Scan0.ToPointer();
-
-                            for (int y = 0; y < height; y++)
-                            {
-                                for (int x = 0; x < width; x++)
-                                {
-                                    var i = width * y + x;
-
-                                    ptr[i] = outsideColorTable[(int)(fractal.HitTest(new Vector3
-                                    {
-                                        x = x / (float)width * bounds.Width + bounds.X,
-                                        y = y / (float)height * bounds.Width + bounds.Y,
-                                        z = z / (float)height * bounds.Width + bounds.Y,
-                                    }) * outsideColorTable.Length)];
-                                }
-                            }
-                        }
+                        var ptr = bits.Scan0;
+                        slice(width, height, bounds.X, bounds.Y, bounds.Width, bounds.Height, z, ptr);
 
                         outp.UnlockBits(bits);
-                        outp.Save(string.Format(@"C:\Users\Anders\Desktop\mandelbox\apa_{0}.png", z));
+                        outp.Save(string.Format(@"..\Render\hd\{0}.png", z));
                     }
 
                     Console.WriteLine(DateTime.Now - start);

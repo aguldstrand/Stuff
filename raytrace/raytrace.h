@@ -58,7 +58,7 @@ namespace renderer {
 
 	extern "C" {
 
-	RAYTRACE_API void render(
+		RAYTRACE_API void render(
 			float boundPosX,
 			float boundPosY,
 			float boundPosZ,
@@ -77,6 +77,17 @@ namespace renderer {
 			Rgb *ptr,
 			int width,
 			int height);
+
+		RAYTRACE_API void slice(
+			int width,
+			int height,
+			float bx,
+			float by,
+			float bw,
+			float bh,
+			int z,
+			Rgb *ptr);
+	
 	}
 
 };
