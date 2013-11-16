@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.IO.MemoryMappedFiles;
 using System.Linq;
 using System.Runtime.InteropServices;
 
@@ -12,7 +14,32 @@ namespace Fractal
         static void Main(string[] args)
         {
             // MandelcubeSlice();
-            Mandelcube();
+            // Mandelcube();
+            Precompute();
+        }
+
+        private static unsafe void Precompute()
+        {
+            for (var i = 11; i < 12; i++)
+            {
+                var side = (int)Math.Pow(2, i);
+                var path = string.Format("mandelcube-{0}.bin", side);
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
+
+                if (!File.Exists(path))
+                {
+                    byte[] buffer = new byte[(int)Math.Ceiling((side * side * side) / 8f)];
+                    fixed (byte* pBuffer = buffer)
+                    {
+                        compute(side, -6.5f, 13f, new IntPtr(pBuffer));
+                    }
+
+                    File.WriteAllBytes(path, buffer);
+                }
+                sw.Stop();
+                Console.WriteLine(path + " - " + sw.Elapsed);
+            }
         }
 
         private static void Mandelcube()
@@ -94,10 +121,18 @@ namespace Fractal
 			int z,
 			IntPtr ptr);
 
+        [DllImport("raytrace.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern void compute(
+            int side,
+            float boundsOffset,
+            float boundsSide,
+            IntPtr buffer);
+
+
         private static void MandelcubeSlice()
         {
-            var width = 1024;
-            var height = 1024;
+            var width = 8;
+            var height = 8;
             var bounds = new RectangleF(-6.5f, -6.5f, 13.0f, 13.0f);
 
             Rgb zero = new Rgb { r = 0, g = 61, b = 245 };

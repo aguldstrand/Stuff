@@ -1,7 +1,6 @@
 # git ignore file
 
 # Fractal
-Fractal.v11.suo
 Fractal/bin
 Fractal/obj
 Render
@@ -12,3 +11,7 @@ raytrace/Debug
 Release
 raytrace/Release
 ipch
+
+*.opensdf
+*.suo
+Assets

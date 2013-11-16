@@ -88,6 +88,12 @@ namespace renderer {
 			int z,
 			Rgb *ptr);
 	
+		RAYTRACE_API void compute(
+			int side,
+			float boundsOffset,
+			float boundsSide,
+			BYTE *buffer);
+
 	}
 
 };

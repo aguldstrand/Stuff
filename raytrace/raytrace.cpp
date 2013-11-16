@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include "raytrace.h"
+#include "ppl.h"
 
 #define threshold 0.1f
 
@@ -162,17 +163,17 @@ extern "C" {
 		int width,
 		int height) {
 
-		std::cout <<"Native" <<std::endl;
+		std::cout << "Native" << std::endl;
 
 		renderer::RayTracer rayTracer(
 			Bounds3(
-				Vector3(boundPosX, boundPosY, boundPosZ),
-				Vector3(boundSizeX, boundSizeY, boundSizeZ)),
+			Vector3(boundPosX, boundPosY, boundPosZ),
+			Vector3(boundSizeX, boundSizeY, boundSizeZ)),
 			renderer::MandelCube(fractalMaxIterations),
 			Camera(
-				Vector3(camPosX, camPosY, camPosZ),
-				Vector3(camLookAtX, camLookAtY, camLookAtZ),
-				Vector2(camFrustrumSizeX, camFrustrumSizeY)));
+			Vector3(camPosX, camPosY, camPosZ),
+			Vector3(camLookAtX, camLookAtY, camLookAtZ),
+			Vector2(camFrustrumSizeX, camFrustrumSizeY)));
 
 		rayTracer.render(ptr, width, height);
 	}
@@ -209,5 +210,33 @@ extern "C" {
 				ptr[i] = outsideColorTable[(int)(mandelCube.hitTest(coordinate) * 255)];
 			}
 		}
+	}
+
+	RAYTRACE_API void compute(int side, float boundsOffset, float boundsSide, BYTE *buffer) {
+
+		renderer::MandelCube mandelCube(255);
+
+		concurrency::parallel_for(0, side, [&](int z) {
+		//for (int z = 0; z < side; z++) {
+			for (int y = 0; y < side; y++) {
+				for (int x = 0; x < side; x++) {
+					int bit = (z * side * side) + (y * side) + x;
+					BYTE val = 0;
+
+					Vector3 coordinate(
+						x / (float)side * boundsSide + boundsOffset,
+						y / (float)side * boundsSide + boundsOffset,
+						z / (float)side * boundsSide + boundsOffset);
+
+					if (mandelCube.hitTest(coordinate) < 20 * 255) {
+						val = 1;
+					}
+
+					buffer[bit / 8] |= val << (bit % 8);
+					bit++;
+				}
+			}
+		});
+
 	}
 }
