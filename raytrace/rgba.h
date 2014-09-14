@@ -117,3 +117,10 @@ struct Camera {
 
 	}
 };
+
+struct Cube {
+	float x;
+	float y;
+	float z;
+	float side;
+};

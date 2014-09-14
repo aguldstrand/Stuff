@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.IO.Compression;
 using System.IO.MemoryMappedFiles;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -18,35 +19,106 @@ namespace Fractal
             Precompute();
         }
 
+        private static void MandelcubeSlice()
+        {
+            var width = 1024 * 1;
+            var height = width;
+            var globalBounds = new RectangleF(-6.5f, -6.5f, 13.0f, 13.0f);
+
+            var numTiles = 16;
+            var tileWidth = globalBounds.Width / numTiles;
+            var tiles = Enumerable.Range(0, numTiles)
+                .SelectMany(x => Enumerable.Range(0, numTiles)
+                    .Select(y => new
+                    {
+                        x = x,
+                        y = y,
+                        bounds = new RectangleF(
+                            globalBounds.X + x * tileWidth,
+                            globalBounds.Y + y * tileWidth,
+                            tileWidth,
+                            tileWidth)
+                    }))
+                .ToArray();
+
+            Enumerable.Range(width / 2, 1)
+                .AsParallel()
+                .AsOrdered()
+                .ForAll(z =>
+                {
+                    tiles.AsParallel()
+                        .ForAll(tile =>
+                        {
+                            var localBounds = tile.bounds;
+
+                            var start = DateTime.Now;
+                            Console.WriteLine(z);
+                            using (var outp = new Bitmap(width, height))
+                            {
+                                var bits = outp.LockBits(new Rectangle(Point.Empty, outp.Size), System.Drawing.Imaging.ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
+                                var ptr = bits.Scan0;
+                                slice(width, height, localBounds.X, localBounds.Y, localBounds.Width, localBounds.Height, z, ptr);
+
+                                outp.UnlockBits(bits);
+                                var path = string.Format(@"..\Render\hd\{0} {1}x{2}.png", z, tile.x, tile.y);
+                                Directory.CreateDirectory(Path.GetDirectoryName(path));
+                                outp.Save(path);
+                            }
+
+                            Console.WriteLine(DateTime.Now - start);
+                        });
+                });
+        }
+
         private static unsafe void Precompute()
         {
-            for (var i = 11; i < 12; i++)
-            {
-                var side = (int)Math.Pow(2, i);
-                var path = string.Format("mandelcube-{0}.bin", side);
-                Stopwatch sw = new Stopwatch();
-                sw.Start();
+            var samples = 128;
+            var divideBy = 8;
 
-                if (!File.Exists(path))
+            var globalBounds = new Cube(-6.5f, -6.5f, -6.5f, 13.0f);
+
+            var tileWidth = globalBounds.Side / divideBy;
+            var tiles = Enumerable.Range(0, divideBy)
+                .SelectMany(x => Enumerable.Range(0, divideBy)
+                    .SelectMany(y => Enumerable.Range(0, divideBy)
+                        .Select(z => new
+                        {
+                            x = x,
+                            y = y,
+                            z = z,
+                            bounds = new Cube(
+                                globalBounds.X + x * tileWidth,
+                                globalBounds.Y + y * tileWidth,
+                                globalBounds.Z + z * tileWidth,
+                                tileWidth)
+                        })))
+                .ToArray();
+
+            Directory.CreateDirectory("data");
+
+            tiles.AsParallel()
+                .WithMergeOptions(ParallelMergeOptions.NotBuffered)
+                .ForAll(tile =>
                 {
-                    byte[] buffer = new byte[(int)Math.Ceiling((side * side * side) / 8f)];
-                    fixed (byte* pBuffer = buffer)
+                    Console.WriteLine("x:{0} y:{1} z:{2}", tile.x, tile.y, tile.z);
+                    var buffer = new byte[samples * samples * samples]; // 1 sample per bit
+                    unsafe
                     {
-                        compute(side, -6.5f, 13f, new IntPtr(pBuffer));
+                        fixed (byte* bufferPtr = buffer)
+                        {
+                            compute(tile.bounds, samples, (IntPtr)bufferPtr);
+                        }
                     }
 
-                    File.WriteAllBytes(path, buffer);
-                }
-                sw.Stop();
-                Console.WriteLine(path + " - " + sw.Elapsed);
-            }
+                    using (var stream = new GZipStream(File.Create(string.Format("data/tile-{0}-{1}-{2}.bin", tile.x, tile.y, tile.z)), CompressionLevel.Fastest))
+                    {
+                        stream.Write(buffer, 0, buffer.Length);
+                    }
+                });
         }
 
         private static void Mandelcube()
         {
-            MandelcubeSlice();
-            return;
-
             var start = DateTime.Now;
 
             int width = 512;
@@ -110,72 +182,44 @@ namespace Fractal
             int width,
             int height);
 
-        [DllImport("raytrace.dll")]
-		private static extern void slice(
-			int width,
-			int height,
-			float bx,
-			float by,
-			float bw,
-			float bh,
-			int z,
-			IntPtr ptr);
+        [DllImport("raytrace.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern void slice(
+            int width,
+            int height,
+            float bx,
+            float by,
+            float bw,
+            float bh,
+            int z,
+            IntPtr ptr);
 
         [DllImport("raytrace.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern void compute(
-            int side,
-            float boundsOffset,
-            float boundsSide,
+            Cube bounds,
+            int samples,
             IntPtr buffer);
-
-
-        private static void MandelcubeSlice()
-        {
-            var width = 8;
-            var height = 8;
-            var bounds = new RectangleF(-6.5f, -6.5f, 13.0f, 13.0f);
-
-            Rgb zero = new Rgb { r = 0, g = 61, b = 245 };
-            Rgb one = new Rgb { r = 245, g = 184, b = 0 };
-
-            Rgb insideColor = new Rgb();
-            Rgb[] outsideColorTable = Enumerable.Range(0, 255)
-                .Select(i =>
-                    i <= 20 ? insideColor :
-                    new Rgb
-                    {
-                        r = (byte)i,
-                        g = (byte)i,
-                        b = (byte)i,
-                    })
-                .ToArray();
-
-            var fractal = new MandelCube(255);
-
-            Enumerable.Range(0, height)
-                .AsParallel()
-                .AsOrdered()
-                .ForAll(z =>
-                {
-                    var start = DateTime.Now;
-                    Console.WriteLine(z);
-                    using (var outp = new Bitmap(width, height))
-                    {
-                        var bits = outp.LockBits(new Rectangle(Point.Empty, outp.Size), System.Drawing.Imaging.ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
-                        var ptr = bits.Scan0;
-                        slice(width, height, bounds.X, bounds.Y, bounds.Width, bounds.Height, z, ptr);
-
-                        outp.UnlockBits(bits);
-                        outp.Save(string.Format(@"..\Render\hd\{0}.png", z));
-                    }
-
-                    Console.WriteLine(DateTime.Now - start);
-                });
-        }
     }
 
     struct Rgb
     {
         public byte r, g, b;
+    }
+
+    struct Cube
+    {
+        public readonly float X;
+        public readonly float Y;
+        public readonly float Z;
+
+        public readonly float Side;
+
+        public Cube(float x, float y, float z, float side)
+        {
+            this.X = x;
+            this.Y = y;
+            this.Z = z;
+
+            this.Side = side;
+        }
     }
 }

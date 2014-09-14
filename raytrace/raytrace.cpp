@@ -196,10 +196,9 @@ extern "C" {
 			}
 		}
 
-		for (int y = 0; y < height; y++)
-		{
-			for (int x = 0; x < width; x++)
-			{
+		concurrency::parallel_for(0, height, [&](int y) {
+			// for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
 				int i = width * y + x;
 
 				Vector3 coordinate(
@@ -209,34 +208,29 @@ extern "C" {
 
 				ptr[i] = outsideColorTable[(int)(mandelCube.hitTest(coordinate) * 255)];
 			}
-		}
+		});
 	}
 
-	RAYTRACE_API void compute(int side, float boundsOffset, float boundsSide, BYTE *buffer) {
+	RAYTRACE_API void compute(Cube bounds, int samples, BYTE* buffer) {
 
 		renderer::MandelCube mandelCube(255);
 
-		concurrency::parallel_for(0, side, [&](int z) {
-		//for (int z = 0; z < side; z++) {
-			for (int y = 0; y < side; y++) {
-				for (int x = 0; x < side; x++) {
-					int bit = (z * side * side) + (y * side) + x;
-					BYTE val = 0;
+		auto sampleStep = bounds.side / samples;
 
+		for (auto z = 0; z < samples; z++) {
+			for (auto x = 0; x < samples; x++) {
+				for (auto y = 0; y < samples; y++) {
 					Vector3 coordinate(
-						x / (float)side * boundsSide + boundsOffset,
-						y / (float)side * boundsSide + boundsOffset,
-						z / (float)side * boundsSide + boundsOffset);
+						bounds.x + x * sampleStep,
+						bounds.y + y * sampleStep,
+						bounds.z + z * sampleStep);
 
-					if (mandelCube.hitTest(coordinate) < 20 * 255) {
-						val = 1;
-					}
+					auto val = (BYTE)(mandelCube.hitTest(coordinate) * 255);
 
-					buffer[bit / 8] |= val << (bit % 8);
-					bit++;
+					buffer[(samples * samples * z) + (samples * y) + x] = val;
 				}
 			}
-		});
+		}
 
 	}
 }
